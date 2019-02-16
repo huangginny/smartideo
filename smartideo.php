@@ -1,19 +1,12 @@
 <?php
 
 /*
-
 Plugin Name: Smartideo
-
 Plugin URI: https://www.rifuyiri.net/t/3639
-
 Description: Smartideo 是为 WordPress 添加对在线视频支持的一款插件（支持手机、平板等设备HTML5播放）。 目前支持优酷、搜狐视频、腾讯视频、爱奇艺、哔哩哔哩，酷6、华数、乐视、YouTube 等网站。
-
 Version: 2.5.0
-
 Author: Fens Liu
-
 Author URI: https://www.rifuyiri.net/t/3639
-
 */
 
 
@@ -170,7 +163,7 @@ class smartideo{
     public function smartideo_embed_handler_bilibili( $matches, $attr, $url, $rawattr ) {
         $matches['video_id'] = ($matches['video_id1'] == '') ? $matches['video_id'] : $matches['video_id1'];
         $page = ($matches['video_id2'] > 1) ? $matches['video_id2'] : 1;
-        $embed = $this->get_iframe("//www.bilibili.com/html/player.html?aid={$matches['video_id']}&page={$page}&as_wide=1", $url);
+        $embed = $this->get_iframe("//player.bilibili.com/player.html?aid={$matches['video_id']}&page={$page}&as_wide=1", $url);
         return apply_filters( 'embed_bilibili', $embed, $matches, $attr, $url, $rawattr );
     }
 
@@ -186,7 +179,7 @@ class smartideo{
             $embed = $this->get_embed("//wscdn.miaopai.com/splayer2.2.0.swf?scid={$matches['video_id']}&token=&autopause=true", $url);
         }
         return apply_filters( 'embed_miaopai', $embed, $matches, $attr, $url, $rawattr );
-    }
+}
     
     public function smartideo_embed_handler_iqiyi( $matches, $attr, $url, $rawattr ) {
         $embed = '';
