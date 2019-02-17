@@ -2,7 +2,7 @@
 class smartideo_admin{
     public function __construct(){
         if($_POST['smartideo_submit'] == '保存'){
-            $param = array('smartideo_code', 'width', 'height', 'width_mobile', 'height_mobile', 'response', 'tips_status', 'tips_content', 'tips_content_mobile', 'youku_client_id', 'bilibili_player');
+            $param = array('smartideo_code', 'width', 'height', 'width_mobile', 'height_mobile', 'response', 'tips_status', 'tips_content', 'tips_content_mobile', 'youku_client_id', 'bilibili_player', 'bilibili_pc_player');
             $option = json_decode(get_option('smartideo_option'), true);
             foreach($_POST as $key => $val){
                 if(in_array($key, $param)){
@@ -66,7 +66,7 @@ class smartideo_admin{
                             <p>
                                 <label title="关闭">
                                     <input type="radio" name="tips_status" value="0" ' . ($option['tips_status'] != 1 ? 'checked="checked"' : '') . '/>
-                                    <span>关闭（默认）</span>
+                                            <span>关闭（默认）</span>
                                 </label>
                             </p>
                             <ul>
@@ -86,7 +86,6 @@ class smartideo_admin{
                         </fieldset>
                     </td>
                 </tr>';
-        if(in_array(strtolower(md5($option['smartideo_code'])), array('c4f1f5e51b0d89c2f5f20e12282d667f', '97d762db98812f54996ae10bb0c00190', '1ba0c5c51cd381690eda3f96ba6fd2e1', '76c2c3119a47313b0e39e53e101d4ffc'))){
             echo '<tr valign="top">
                     <th scope="row">优酷client_id</th>
                     <td>
@@ -95,20 +94,25 @@ class smartideo_admin{
                         <p class="description">供优酷开发者使用，没有client_id请留空</p>
                     </td>
                 </tr>';
-        }else{
             echo '<tr valign="top">
-                <th scope="row">高级功能激活码</th>
-                <td>
-                    <label><input type="text" class="regular-text code" name="smartideo_code" value="'.$option['smartideo_code'].'"></label>
-                    <br />
-                    <p class="description">
-                        使用方法：<br />
-                        1.升级到最新版本（<a href="https://www.rifuyiri.net/t/3639#changelog" target="_blank">' . SMARTIDEO_VERSION . '</a>），填入激活码保存后可开启高级功能。<br />
-                        2.激活码关注微信公众号“<a href="/wp-content/plugins/smartideo/static/qrcode.jpg" target="_blank">ri-fu-yi-ri</a>”回复“Smartideo Code”即可获得～<br />
-                        注意：如果激活码失效，请按照上述方法重新获取。</p>
-                </td>
-            </tr>';
-        }
+                    <th scope="row">哔哩哔哩电脑端播放器</th>
+                    <td>
+                        <fieldset>
+                            <p>
+                                <label title="使用H5播放器">
+                                    <input type="radio" name="bilibili_pc_player" value="1" ' . ($option['bilibili_pc_player'] == 1 ? 'checked="checked"' : '') . '/>
+                                    <span>使用H5播放器（如果你的博客有哔哩哔哩的授权可以使用）</span>
+                                </label>
+                            </p>
+                            <p>
+                                <label title="源站播放">
+                                    <input type="radio" name="bilibili_pc_player" value="0" ' . ($option['bilibili_pc_player'] != 1 ? 'checked="checked"' : '') . '/>
+                                    <span>源站播放（默认，跳转至哔哩哔哩播放）</span>
+                                </label>
+                            </p>
+                        </fieldset>
+                    </td>
+                </tr>';
         echo '</table>
             <p class="submit"><input type="submit" name="smartideo_submit" id="submit" class="button-primary" value="保存"></p>
             </form>';
