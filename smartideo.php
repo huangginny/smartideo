@@ -293,9 +293,10 @@ class smartideo{
         $html = '';
         $html .=
             '<div class="smartideo">
-                <div class="player"' . $this->get_size_style($width, $height) . '>
-                    <embed src="' . $url . '" allowFullScreen="true" quality="high" width="100%" height="100%" allowScriptAccess="always" type="application/x-shockwave-flash" wmode="transparent"></embed>
-                </div>';
+                <video id="my-video" class="video-js" controls preload="auto" height="360"
+                data-setup="{}">
+                    <source src="'.$url.'" type="video/mp4">
+                </video>';
         if($this->option['tips_status'] == 1 && !$this->edit){
             if(empty($source)){
                 $source = 'javascript:void(0);';
@@ -310,21 +311,20 @@ class smartideo{
     }
 
     private function get_iframe($url = '', $source = '', $width = '', $height = ''){
-        $html = '';
+        $html = ''; //<div class="player" style="width: 100%;height: 500px;">
         $html .=
             '<div class="smartideo">
-                <div class="player"' . $this->get_size_style($width, $height) . '>
-                    <iframe src="' . $url . '" width="100%" height="100%" frameborder="0" allowfullscreen="true"></iframe>
-                </div>';
-        if(isset($this->option['tips_status']) && $this->option['tips_status'] == 1 && !$this->edit){
-            if(empty($source)){
-                $source = 'javascript:void(0);';
-            }
-            $html .=
-                '<div class="tips">
-                    <a href="' . $source . '" target="_blank" smartideo-title="' . $this->option['tips_content'] . '" smartideo-title-mobile="' . $this->option['tips_content_mobile'] . '" title="' . $this->option['tips_content'] . '" class="smartideo-tips" rel="nofollow"></a>
-                </div>';
-        }
+                <iframe src="' . $url . '" width="100%" height="100%" frameborder="0" allowfullscreen="true"></iframe>
+                ';
+        // if(isset($this->option['tips_status']) && $this->option['tips_status'] == 1 && !$this->edit){
+        //     if(empty($source)){
+        //         $source = 'javascript:void(0);';
+        //     }
+        //     $html .=
+        //         '<div class="tips">
+        //             <a href="' . $source . '" target="_blank" smartideo-title="' . $this->option['tips_content'] . '" smartideo-title-mobile="' . $this->option['tips_content_mobile'] . '" title="' . $this->option['tips_content'] . '" class="smartideo-tips" rel="nofollow"></a>
+        //         </div>';
+        // }
         $html .= '</div>';
         return $html;
     }
@@ -391,3 +391,5 @@ class smartideo{
         return $style;
     }
 }
+
+
