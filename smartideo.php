@@ -311,20 +311,11 @@ class smartideo{
     }
 
     private function get_iframe($url = '', $source = '', $width = '', $height = ''){
-        $html = ''; //<div class="player" style="width: 100%;height: 500px;">
+        $html = '';
         $html .=
             '<div class="smartideo">
                 <iframe src="' . $url . '" width="100%" height="100%" frameborder="0" allowfullscreen="true"></iframe>
                 ';
-        // if(isset($this->option['tips_status']) && $this->option['tips_status'] == 1 && !$this->edit){
-        //     if(empty($source)){
-        //         $source = 'javascript:void(0);';
-        //     }
-        //     $html .=
-        //         '<div class="tips">
-        //             <a href="' . $source . '" target="_blank" smartideo-title="' . $this->option['tips_content'] . '" smartideo-title-mobile="' . $this->option['tips_content_mobile'] . '" title="' . $this->option['tips_content'] . '" class="smartideo-tips" rel="nofollow"></a>
-        //         </div>';
-        // }
         $html .= '</div>';
         return $html;
     }
@@ -333,7 +324,7 @@ class smartideo{
         $html = '';
         $html .=  
             '<div class="smartideo">
-                <div class="player"' . $this->get_size_style(0, 0) . '>
+                <div class="player">
                     <a href="' . $url . '" target="_blank" class="smartideo-play-link"><div class="smartideo-play-button"></div></a>
                     <p style="color: #999;margin-top: 50px;">暂时无法播放，可回源网站播放</p>
                 </div>
@@ -361,34 +352,6 @@ class smartideo{
         }else{
             return false;
         }
-    }
-    private function get_size_style($width, $height){
-        if(empty($width) || empty($height)){
-            $width = $height = 0;
-            if($this->edit){
-                $width = $this->width;
-                $height = $this->height;
-            }else if($this->option['response'] == 0){
-                if(wp_is_mobile()){
-                    $width = $this->option['width_mobile'];
-                    $height = $this->option['height_mobile'];
-                }else{
-                    $width = $this->option['width'];
-                    $height = $this->option['height'];
-                }
-            }
-        }
-        $style = '';
-        if(!empty($width)){
-            $style .= "width: {$width};";
-        }
-        if(!empty($height)){
-            $style .= "height: {$height};";
-        }
-        if(!empty($style)){
-            $style = ' style="' . $style . '"';
-        }
-        return $style;
     }
 }
 

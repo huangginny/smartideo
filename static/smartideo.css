@@ -14,3 +14,12 @@
 @media screen and (max-width:479px){
     .smartideo iframe { height: 250px; }
 }
+
+.wp-video video {
+    height: auto;
+    width: 100%;
+}
+
+.post-video .wp-video {
+    width: 100% !important;
+}
