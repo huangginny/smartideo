@@ -75,7 +75,7 @@ class smartideo{
             array($this, 'smartideo_embed_handler_acfun') );
 
         wp_embed_register_handler( 'smartideo_bilibili',
-            '#https?://www\.bilibili\.com/video/av(?:(?<video_id1>\d+)/(?:index_|\#page=)(?<video_id2>\d+)|(?<video_id>\d+))#i',
+            '#https?://www\.bilibili\.com/video/av(?:(?<video_id1>\d+)/(?:index_|\?p=)(?<video_id2>\d+)|(?<video_id>\d+))#i',
             array($this, 'smartideo_embed_handler_bilibili') );
 
         wp_embed_register_handler( 'smartideo_miaopai',
