@@ -164,11 +164,19 @@ class smartideo{
     public function smartideo_embed_handler_bilibili( $matches, $attr, $url, $rawattr ) {
         $matches['video_id'] = ($matches['video_id1'] == '') ? $matches['video_id'] : $matches['video_id1'];
         $page = ($matches['video_id2'] > 1) ? $matches['video_id2'] : 1;
-        if(wp_is_mobile() || $this->bilibili_pc_player == 1){
-            $embed = $this->get_iframe("//player.bilibili.com/player.html?aid={$matches['video_id']}&page={$page}&as_wide=1", $url);
-        }else{
-            $embed = $this->get_link($url);
-        }
+		$cid = '';
+        try{
+            $request = new WP_Http();
+            $url = "https://www.bilibili.com/widget/getPageList?aid=" . $matches['video_id'];
+            $data = (array)$request->request($url, array('timeout' => 3));
+            $json = json_decode($data['body'], true);
+            print_r($json);
+            foreach ($json as $j) {
+                if ($j['page'] == $page) $cid = $j['cid'];
+            }
+        } catch(Exception $e) {}
+        
+        $embed = $this->get_iframe("//player.bilibili.com/player.html?aid={$matches['video_id']}&cid={$cid}&page={$page}&as_wide=1", $url);
         return apply_filters( 'embed_bilibili', $embed, $matches, $attr, $url, $rawattr );
     }
 
