@@ -170,7 +170,6 @@ class smartideo{
             $url = "https://www.bilibili.com/widget/getPageList?aid=" . $matches['video_id'];
             $data = (array)$request->request($url, array('timeout' => 3));
             $json = json_decode($data['body'], true);
-            print_r($json);
             foreach ($json as $j) {
                 if ($j['page'] == $page) $cid = $j['cid'];
             }
