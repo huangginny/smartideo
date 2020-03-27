@@ -3,7 +3,7 @@
 Plugin Name: SmartideoModified
 Plugin URI: https://www.rifuyiri.net/t/3639
 Description: Smartideo 是为 WordPress 添加对在线视频支持的一款插件（支持手机、平板等设备HTML5播放）。 目前支持优酷、搜狐视频、腾讯视频、爱奇艺、哔哩哔哩，酷6、华数、乐视、YouTube 等网站。
-Version: 3.0.1
+Version: 3.0.2
 Author: Fens Liu
 Author URI: https://www.rifuyiri.net/t/3639
 */
