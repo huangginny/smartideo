@@ -75,7 +75,7 @@ class smartideo{
             array($this, 'smartideo_embed_handler_acfun') );
 
         wp_embed_register_handler( 'smartideo_bilibili',
-            '#https?://www\.bilibili\.com/video/av(?:(?<video_id1>\d+)/(?:index_|\?p=)(?<video_id2>\d+)|(?<video_id>\d+))#i',
+            '#https?://www\.bilibili\.com/video/(?:(?<video_id1>\d+)/(?:index_|\?p=)(?<video_id2>\d+)|(?<video_id>\w+))#i',
             array($this, 'smartideo_embed_handler_bilibili') );
 
         wp_embed_register_handler( 'smartideo_miaopai',
@@ -164,18 +164,24 @@ class smartideo{
     public function smartideo_embed_handler_bilibili( $matches, $attr, $url, $rawattr ) {
         $matches['video_id'] = ($matches['video_id1'] == '') ? $matches['video_id'] : $matches['video_id1'];
         $page = ($matches['video_id2'] > 1) ? $matches['video_id2'] : 1;
-		$cid = '';
-        try{
-            $request = new WP_Http();
-            $url = "https://www.bilibili.com/widget/getPageList?aid=" . $matches['video_id'];
-            $data = (array)$request->request($url, array('timeout' => 3));
-            $json = json_decode($data['body'], true);
-            foreach ($json as $j) {
-                if ($j['page'] == $page) $cid = $j['cid'];
-            }
-        } catch(Exception $e) {}
-        
-        $embed = $this->get_iframe("//player.bilibili.com/player.html?aid={$matches['video_id']}&cid={$cid}&page={$page}&as_wide=1", $url);
+        if (preg_match('#^av#', $matches['video_id'])) {
+            $cid = '';
+            $video_id = str_replace('av', '', $matches['video_id']);
+            try{
+                $request = new WP_Http();
+                $url = "https://www.bilibili.com/widget/getPageList?aid=" . $video_id;
+                $data = (array)$request->request($url, array('timeout' => 3));
+                $json = json_decode($data['body'], true);
+                foreach ($json as $j) {
+                    if ($j['page'] == $page) $cid = $j['cid'];
+                }
+            } catch(Exception $e) {}
+            
+            $embed = $this->get_iframe("//player.bilibili.com/player.html?aid={$video_id}&cid={$cid}&page={$page}&as_wide=1", $url);
+        } else {
+            $embed = $this->get_iframe("//player.bilibili.com/player.html?bvid={$matches['video_id']}&page={$page}&as_wide=1", $url);
+        }
+		
         return apply_filters( 'embed_bilibili', $embed, $matches, $attr, $url, $rawattr );
     }
 
