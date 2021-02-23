@@ -2,15 +2,15 @@
 /*
 Plugin Name: SmartideoModified
 Plugin URI: https://www.rifuyiri.net/t/3639
-Description: Smartideo 是为 WordPress 添加对在线视频支持的一款插件（支持手机、平板等设备HTML5播放）。 目前支持优酷、搜狐视频、腾讯视频、爱奇艺、哔哩哔哩，酷6、华数、乐视、YouTube 等网站。
-Version: 3.0.2
+Description: Smartideo 是为 WordPress 添加对在线视频支持的一款插件（支持手机、平板等设备HTML5播放）。 目前支持微博，优酷、搜狐视频、腾讯视频、爱奇艺、哔哩哔哩，酷6、华数、乐视、YouTube 等网站。
+Version: 3.0.3
 Author: Fens Liu
 Author URI: https://www.rifuyiri.net/t/3639
 */
 
 
 
-define('SMARTIDEO_VERSION', '3.0.0');
+define('SMARTIDEO_VERSION', '3.0.3');
 define('SMARTIDEO_URL', plugins_url('', __FILE__));
 define('SMARTIDEO_PATH', dirname( __FILE__ ));
 
@@ -83,8 +83,12 @@ class smartideo{
             array($this, 'smartideo_embed_handler_miaopai') );
 
         wp_embed_register_handler( 'smartideo_weibo',
-            '#https?://weibo\.com/tv/v/(?:[a-z0-9_\./]+\?fid=1034:(?<video_id>[a-z0-9_=\-]+))#i',
+            '#https?://video\.weibo\.com/show\?fid=1034:[0-9]+#i',
             array($this, 'smartideo_embed_handler_weibo') );
+        
+        wp_embed_register_handler( 'smartideo_weibo_short',
+            '#https?://t.cn/[A-Za-z0-9]+\?m=[0-9]+&u=[0-9]+#i',
+            array($this, 'smartideo_embed_handler_weibo_short') );
         
         wp_embed_register_handler( 'smartideo_iqiyi',
             '#https?://www\.iqiyi\.com/(?:[a-zA-Z]+)_(?<video_id>[a-z0-9_~\-]+)#i',
@@ -181,7 +185,6 @@ class smartideo{
         } else {
             $embed = $this->get_iframe("//player.bilibili.com/player.html?bvid={$matches['video_id']}&page={$page}&as_wide=1", $url);
         }
-		
         return apply_filters( 'embed_bilibili', $embed, $matches, $attr, $url, $rawattr );
     }
 
@@ -224,18 +227,57 @@ class smartideo{
     }
 
     public function smartideo_embed_handler_56( $matches, $attr, $url, $rawattr ) {
-	$matches['video_id'] = $matches['video_id1'] == '' ? $matches['video_id2'] : $matches['video_id1'];
+        $matches['video_id'] = $matches['video_id1'] == '' ? $matches['video_id2'] : $matches['video_id1'];
         $embed = $this->get_iframe("http://www.56.com/iframe/{$matches['video_id']}", $url);
         return apply_filters( 'embed_56', $embed, $matches, $attr, $url, $rawattr );
     }
     
-    # video widthout h5
+    # long form video
     public function smartideo_embed_handler_weibo( $matches, $attr, $url, $rawattr ) {
-        $embed = $this->get_embed("http://video.weibo.com/player/1034:{$matches['video_id']}/v.swf", $url);
-        if(wp_is_mobile()){
-            $embed = $this->get_link($url);
+        return apply_filters( 'embed_weibo', $this->get_weibo_embed($url), $matches, $attr, $url, $rawattr );
+    }
+    
+    # short form video
+    public function smartideo_embed_handler_weibo_short( $matches, $attr, $url, $rawattr ) {
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+        curl_exec($ch);
+        $full_url = curl_getinfo($ch, CURLINFO_REDIRECT_URL);
+        curl_close($ch);
+        
+        return apply_filters( 'embed_weibo_short', $this->get_weibo_embed($full_url), $matches, $attr, $url, $rawattr );
+    }
+    
+    private function get_weibo_embed( $full_url ) {
+        $ch = curl_init($full_url);
+        
+        // set uset agent to iPhone to get H5 video url
+        curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (iPhone; CPU iPhone OS 14_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.3 Mobile/15E148 Safari/604.1");
+        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+        curl_exec($ch);
+        $wb_h5_url = curl_getinfo($ch, CURLINFO_REDIRECT_URL);
+        curl_close($ch);
+        
+        if (empty($wb_h5_url)) {
+            $embed = $this->get_link($full_url);
+        } else {
+            $wb_h5_pattern = "#https?://video\.h5\.weibo\.cn/(?<object_id>1034:[0-9]+)/(?<mid>[0-9]+)#i";
+            preg_match($wb_h5_pattern, $wb_h5_url, $matches);
+            
+            try {
+                $wb_api_url = sprintf("https://video.h5.weibo.cn/s/video/object?object_id=%s&mid=%s", $matches["object_id"], $matches["mid"]);
+            
+                $wb_api_string = file_get_contents($wb_api_url);
+                $wb_api_jsonobject = json_decode($wb_api_string);
+                $embed = $this->get_iframe($wb_api_jsonobject->data->object->stream->hd_url, $full_url);
+            } catch (Exception $e) {
+                $embed = $this->get_link($full_url);
+            }
+            
         }
-        return apply_filters( 'embed_weibo', $embed, $matches, $attr, $url, $rawattr );
+        return $embed;
     }
     
     public function smartideo_embed_handler_yinyuetai( $matches, $attr, $url, $rawattr ){
